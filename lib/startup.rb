@@ -32,6 +32,40 @@ class Startup
   end
 
   def pay_employee(employee)
-    # continue here
+    pay_amount = @salaries[employee.title]
+    if @funding > pay_amount
+      employee.pay(pay_amount)
+      @funding -= pay_amount
+    else
+      raise "Not enough funds available"
+    end
+  end
+
+  def payday
+    @employees.each {|employee| self.pay_employee(employee)}
+  end
+
+  def average_salary
+    pay_total = 0
+    @employees.each do |employee|
+      pay_total += @salaries[employee.title]
+    end
+    pay_total / (@employees.length * 1.0)
+  end
+
+  def close
+    @employees = []
+    @funding = 0
+  end
+
+  def acquire(startup)
+    @funding += startup.funding
+    startup.salaries.each do |title, salary|
+      if !@salaries.keys.include?(title)
+        @salaries[title] = salary
+      end
+    end
+    @employees.push(*startup.employees)
+    startup.close
   end
 end
